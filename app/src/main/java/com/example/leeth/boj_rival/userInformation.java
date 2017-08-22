@@ -8,13 +8,9 @@ import java.util.ArrayList;
 
 public class userInformation {
     String _id;
-    boolean ok;
     ArrayList<Integer> problems;
+    int last;
     userInformation() {
-            ok=true;
-        }
-    boolean isOk() {
-            return ok;
-        }
-    //TODO
+        problems = new ArrayList<Integer>();
+    }
 }
