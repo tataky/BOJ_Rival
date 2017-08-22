@@ -23,20 +23,7 @@ import java.util.ArrayList;
 
 public class add_user extends AppCompatActivity {
 
-    class user_information {
-        String _id;
-        boolean ok;
-        ArrayList<Integer> problems;
-        user_information() {
-            ok=true;
-        }
-        boolean isOk() {
-            return ok;
-        }
-        //TODO
-    }
 
-    user_information currentUser;
 
     public static final int REQUEST_CODE_ANOTHER = 1001;
 
@@ -48,32 +35,6 @@ public class add_user extends AppCompatActivity {
         b.setEnabled(false);
     }
 
-    public void crawl(String userName) {
-        user_information ui = new user_information();
-        //crawl
-        currentUser = ui;
-        if(!ui.isOk()) {
-            return;
-        } else {
-            /*
-            String FILENAME = "user_information";
-            String string = "byungsin";
-            try {
-                FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_APPEND);
-                try {
-                    fos.write(string.getBytes());
-                    fos.close();
-                } catch (IOException e) {
-                    System.exit(1);
-                }
-            } catch (FileNotFoundException e) {
-                System.exit(1);
-            }
-            */
-            return;
-        }
-    }
-
     public void getNewUser(View view) {
         InputMethodManager inputManager = (InputMethodManager)
                 getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -81,15 +42,19 @@ public class add_user extends AppCompatActivity {
                 InputMethodManager.HIDE_NOT_ALWAYS);
         EditText edit = (EditText)findViewById(R.id.edittext);
         String userName = edit.getText().toString();
-        crawl(userName);
+        crawler cr = new crawler();
         TextView v = (TextView)findViewById(R.id.resultview);
-        if(!currentUser.isOk()) {
+        if(!cr.isExist(userName)) {
             String result = ("Cannot find user " + userName);
             v.setText(result.toCharArray(),0,result.length());
             Button b = (Button)findViewById(R.id.button2);
             b.setEnabled(false);
         } else {
-            v.setText(userName.toCharArray(),0,userName.length());
+            userInformation currentUser = cr.crawl(userName);
+            /*currentUser.problems = new ArrayList<Integer>();
+            String printString = userName + " : Accepted " + Integer.toString(currentUser.problems.size()) + "\n";
+            v.setText(printString.toCharArray(),0,printString.length());
+            */
             Button b = (Button)findViewById(R.id.button2);
             b.setEnabled(true);
         }
