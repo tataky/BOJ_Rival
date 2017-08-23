@@ -26,6 +26,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
 import static android.provider.Telephony.Mms.Part.FILENAME;
+import static java.lang.System.exit;
 
 
 /**
@@ -74,33 +75,66 @@ public class add_user extends AppCompatActivity {
         final String fileName = "user_information";
 
         TextView v = (TextView) findViewById(R.id.resultview);
+        File f = new File(fileName);
+
+        //FUCK THIS CODE
+        if(!f.exists()) {
+            try {
+                FileOutputStream fos = openFileOutput(fileName, MODE_PRIVATE);
+                JSONObject obj = new JSONObject();
+                fos.write((obj.toString()).getBytes());
+                fos.close();
+            } catch (Exception e) {
+                v.setText("WHY1".toCharArray(),0,3);
+                return;
+            }
+        }
 
         JSONParser parser = new JSONParser();
         try {
-            Object userInfo = parser.parse(new FileReader(fileName));
-            JSONObject jsonObject = (JSONObject) userInfo;
+            FileInputStream fis = openFileInput(fileName);
+            byte[] data = new byte[fis.available()];
+            while(fis.read(data) != -1){}
+            fis.close();
+            Object userInfo = parser.parse(new String(data));
+
+            JSONObject jsonObject = new JSONObject(userInfo.toString());
+
             if (jsonObject.has(currentUser._id)) {
                 String str = "Already exist";
                 v.setText(str.toCharArray(),0,str.length());
                 return;
             }
+
             JSONObject obj = new JSONObject();
             obj.put("last", currentUser.last);
             obj.put("problemPool", new JSONObject(currentUser.problems));
             jsonObject.put(currentUser._id, obj);
-            FileWriter fo = new FileWriter(fileName);
-            fo.write(jsonObject.toString());
-            fo.close();
-            String result = "Successfully added " + currentUser._id;
+
+            FileOutputStream fos = openFileOutput(fileName, MODE_APPEND);
+            fos.write((jsonObject.toString()).getBytes());
+            fos.close();
+
+ //           String result = "Successfully added " + currentUser._id;
+            String result = jsonObject.toString();
             v.setText(result.toCharArray(),0,result.length());
-        } catch (org.json.JSONException e) {
-            return;
-        } catch (java.io.FileNotFoundException e) {
-            return;
-        } catch (org.json.simple.parser.ParseException e) {
-            return;
-        } catch (java.io.IOException e) {
+        } catch (Exception e) {
+            v.setText("WHY".toCharArray(),0,3);
             return;
         }
+        /*catch (org.json.JSONException e) {
+            v.setText("AA1".toCharArray(),0,3);
+            return;
+        } catch (java.io.FileNotFoundException e) {
+            v.setText("AA2".toCharArray(),0,3);
+            return;
+        } catch (org.json.simple.parser.ParseException e) {
+            v.setText("AA3".toCharArray(),0,3);
+            return;
+        } catch (java.io.IOException e) {
+            v.setText("AA4".toCharArray(),0,3);
+            return;
+        }
+        */
     }
 }
