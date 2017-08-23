@@ -11,9 +11,20 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import android.content.Intent;
 
+import org.json.simple.parser.JSONParser;
+import org.json.simple.*;
+
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.RandomAccessFile;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Set;
 
 public class main extends AppCompatActivity {
 
@@ -40,9 +51,23 @@ public class main extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+
+        BufferedReader br;
+        try {
+            br = new BufferedReader(new FileReader("user_information"));
+            String line;
+            while ((line = br.readLine()) != null) {
+                Toast.makeText(getApplicationContext(),line,Toast.LENGTH_LONG).show();
+            }
+        } catch (java.io.IOException e) {
+        }
         //refresh
+        /*
         try {
             String FILENAME = "user_information";
+            //FileOutputStream fos = openFileOutput(FILENAME, MODE_PRIVATE);
+            //fos.write("".getBytes());
+            //fos.close();
             FileInputStream fis = openFileInput(FILENAME);
             try {
                 byte[] readBuffer = new byte[fis.available()];
@@ -51,11 +76,15 @@ public class main extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), new String(readBuffer), Toast.LENGTH_LONG).show();
                 fis.close();
             } catch (IOException e) {
-                System.exit(1);
+                return;
             }
         } catch (FileNotFoundException e) {
-            System.exit(1);
+            return;
+        } catch (java.io.IOException e) {
+            return;
         }
+
+        */
     }
 
     @Override
@@ -78,5 +107,25 @@ public class main extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void makeUserButton() {
+        JSONParser parser = new JSONParser();
+        String file = "user_information";
+        try {
+            Object obj = parser.parse(new FileReader(file));
+            JSONObject jsonObject = (JSONObject) obj;
+
+            Set<String> keys = jsonObject.keySet();
+            for (String userName : keys) {
+                Toast.makeText(getApplicationContext(),userName,Toast.LENGTH_LONG).show();
+            }
+        } catch (java.io.FileNotFoundException e) {
+            return;
+        } catch (java.io.IOException e) {
+            return;
+        } catch (org.json.simple.parser.ParseException e) {
+            return;
+        }
     }
 }

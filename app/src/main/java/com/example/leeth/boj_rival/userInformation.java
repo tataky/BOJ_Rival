@@ -1,6 +1,7 @@
 package com.example.leeth.boj_rival;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by leeth on 2017-08-22.
@@ -8,13 +9,9 @@ import java.util.ArrayList;
 
 public class userInformation {
     String _id;
-    boolean ok;
-    ArrayList<Integer> problems;
+    HashMap<String, String> problems;
+    int last;
     userInformation() {
-            ok=true;
-        }
-    boolean isOk() {
-            return ok;
-        }
-    //TODO
+        problems = new HashMap<String, String>();
+    }
 }

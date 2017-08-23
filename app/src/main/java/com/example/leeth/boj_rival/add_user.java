@@ -11,11 +11,22 @@ import android.widget.Button;
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
 
+import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
+
+import static android.provider.Telephony.Mms.Part.FILENAME;
+
 
 /**
  * Created by leeth on 2017-08-21.
@@ -23,7 +34,7 @@ import java.util.ArrayList;
 
 public class add_user extends AppCompatActivity {
 
-
+    userInformation currentUser;
 
     public static final int REQUEST_CODE_ANOTHER = 1001;
 
@@ -50,11 +61,9 @@ public class add_user extends AppCompatActivity {
             Button b = (Button)findViewById(R.id.button2);
             b.setEnabled(false);
         } else {
-            userInformation currentUser = cr.crawl(userName);
-            /*currentUser.problems = new ArrayList<Integer>();
-            String printString = userName + " : Accepted " + Integer.toString(currentUser.problems.size()) + "\n";
+            currentUser = cr.crawl(userName);
+            String printString = currentUser._id + " : Accepted " + Integer.toString(currentUser.problems.size()) + "\n";
             v.setText(printString.toCharArray(),0,printString.length());
-            */
             Button b = (Button)findViewById(R.id.button2);
             b.setEnabled(true);
         }
@@ -62,19 +71,36 @@ public class add_user extends AppCompatActivity {
     }
 
     public void addUser(View view) {
-        //write currentUser to user_information
-        String FILENAME = "user_information";
-        String string = "byungsin";
+        final String fileName = "user_information";
+
+        TextView v = (TextView) findViewById(R.id.resultview);
+
+        JSONParser parser = new JSONParser();
         try {
-            FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_APPEND);
-            try {
-                fos.write(string.getBytes());
-                fos.close();
-            } catch (IOException e) {
-                System.exit(1);
+            Object userInfo = parser.parse(new FileReader(fileName));
+            JSONObject jsonObject = (JSONObject) userInfo;
+            if (jsonObject.has(currentUser._id)) {
+                String str = "Already exist";
+                v.setText(str.toCharArray(),0,str.length());
+                return;
             }
-        } catch (FileNotFoundException e) {
-            System.exit(1);
+            JSONObject obj = new JSONObject();
+            obj.put("last", currentUser.last);
+            obj.put("problemPool", new JSONObject(currentUser.problems));
+            jsonObject.put(currentUser._id, obj);
+            FileWriter fo = new FileWriter(fileName);
+            fo.write(jsonObject.toString());
+            fo.close();
+            String result = "Successfully added " + currentUser._id;
+            v.setText(result.toCharArray(),0,result.length());
+        } catch (org.json.JSONException e) {
+            return;
+        } catch (java.io.FileNotFoundException e) {
+            return;
+        } catch (org.json.simple.parser.ParseException e) {
+            return;
+        } catch (java.io.IOException e) {
+            return;
         }
     }
 }
