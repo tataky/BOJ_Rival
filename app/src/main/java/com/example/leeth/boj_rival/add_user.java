@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 import static android.provider.Telephony.Mms.Part.FILENAME;
 import static java.lang.System.exit;
+import static java.security.AccessController.getContext;
 
 
 /**
@@ -42,6 +43,7 @@ public class add_user extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.user_add_input);
         Button b = (Button)findViewById(R.id.button2);
         b.setEnabled(false);
@@ -52,19 +54,21 @@ public class add_user extends AppCompatActivity {
                 getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
                 InputMethodManager.HIDE_NOT_ALWAYS);
+
         EditText edit = (EditText)findViewById(R.id.edittext);
         String userName = edit.getText().toString();
         crawler cr = new crawler();
         TextView v = (TextView)findViewById(R.id.resultview);
+
         if(!cr.isExist(userName)) {
             String result = ("Cannot find user " + userName);
-            v.setText(result.toCharArray(),0,result.length());
+            v.setText(result.toCharArray(), 0, result.length());
             Button b = (Button)findViewById(R.id.button2);
             b.setEnabled(false);
         } else {
             currentUser = cr.crawl(userName);
             String printString = currentUser._id + " : Accepted " + Integer.toString(currentUser.problems.size()) + "\n";
-            v.setText(printString.toCharArray(),0,printString.length());
+            v.setText(printString.toCharArray(), 0, printString.length());
             Button b = (Button)findViewById(R.id.button2);
             b.setEnabled(true);
         }
@@ -75,9 +79,10 @@ public class add_user extends AppCompatActivity {
         final String fileName = "user_information";
 
         TextView v = (TextView) findViewById(R.id.resultview);
-        File f = new File(fileName);
+        // change : getFileStreamPath
+        File f = getFileStreamPath(fileName);
 
-        //FUCK THIS CODE
+        // if file is not exist, make new empty json file
         if(!f.exists()) {
             try {
                 FileOutputStream fos = openFileOutput(fileName, MODE_PRIVATE);
@@ -96,13 +101,13 @@ public class add_user extends AppCompatActivity {
             byte[] data = new byte[fis.available()];
             while(fis.read(data) != -1){}
             fis.close();
-            Object userInfo = parser.parse(new String(data));
 
+            Object userInfo = parser.parse(new String(data));
             JSONObject jsonObject = new JSONObject(userInfo.toString());
 
             if (jsonObject.has(currentUser._id)) {
                 String str = "Already exist";
-                v.setText(str.toCharArray(),0,str.length());
+                v.setText(str.toCharArray(), 0, str.length());
                 return;
             }
 
@@ -111,30 +116,16 @@ public class add_user extends AppCompatActivity {
             obj.put("problemPool", new JSONObject(currentUser.problems));
             jsonObject.put(currentUser._id, obj);
 
-            FileOutputStream fos = openFileOutput(fileName, MODE_APPEND);
-            fos.write((jsonObject.toString()).getBytes());
+            // change : not mode_append
+            FileOutputStream fos = openFileOutput(fileName, MODE_PRIVATE);
+            fos.write(jsonObject.toString().getBytes());
             fos.close();
 
- //           String result = "Successfully added " + currentUser._id;
-            String result = jsonObject.toString();
-            v.setText(result.toCharArray(),0,result.length());
+            // how about making this toast?
+            String result = "Successfully added " + currentUser._id;
+            v.setText(result.toCharArray(), 0, result.length());
         } catch (Exception e) {
-            v.setText("WHY".toCharArray(),0,3);
             return;
         }
-        /*catch (org.json.JSONException e) {
-            v.setText("AA1".toCharArray(),0,3);
-            return;
-        } catch (java.io.FileNotFoundException e) {
-            v.setText("AA2".toCharArray(),0,3);
-            return;
-        } catch (org.json.simple.parser.ParseException e) {
-            v.setText("AA3".toCharArray(),0,3);
-            return;
-        } catch (java.io.IOException e) {
-            v.setText("AA4".toCharArray(),0,3);
-            return;
-        }
-        */
     }
 }

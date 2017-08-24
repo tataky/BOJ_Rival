@@ -41,9 +41,8 @@ public class main extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(main.this, add_user.class);
                 startActivity(intent);
-            //    Toast.makeText(getApplicationContext(),"Hello World!",Toast.LENGTH_SHORT).show();
- //               Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-   //                     .setAction("Action", null).show();
+                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();*/
             }
         });
     }
@@ -61,6 +60,7 @@ public class main extends AppCompatActivity {
             }
         } catch (java.io.IOException e) {
         }
+
         //refresh
         /*
         try {
@@ -83,7 +83,6 @@ public class main extends AppCompatActivity {
         } catch (java.io.IOException e) {
             return;
         }
-
         */
     }
 
@@ -121,11 +120,11 @@ public class main extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),userName,Toast.LENGTH_LONG).show();
             }
         } catch (java.io.FileNotFoundException e) {
-            return;
+
         } catch (java.io.IOException e) {
-            return;
+
         } catch (org.json.simple.parser.ParseException e) {
-            return;
+
         }
     }
 }
