@@ -8,10 +8,12 @@ import java.util.HashMap;
  */
 
 public class userInformation {
-    String _id;
-    HashMap<String, String> problems;
-    int last;
-    userInformation() {
+    // change public to private
+    public String _id;
+    public HashMap<String, String> problems;
+    public int last;
+
+    public userInformation() {
         problems = new HashMap<String, String>();
     }
 }

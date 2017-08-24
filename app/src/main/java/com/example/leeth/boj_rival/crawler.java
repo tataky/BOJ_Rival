@@ -41,15 +41,14 @@ public class crawler extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            if (status == "isExist") {
-                super.onPreExecute();
+            super.onPreExecute();
+            ui = new userInformation();
+
+            if (status.equals("isExist")) {
                 url = "https://acmicpc.net/user/" + userName;
-                ui = new userInformation();
                 doc_userinfo = null;
-            } else if (status == "crawl") {
-                super.onPreExecute();
+            } else if (status.equals("crawl")) {
                 url = "https://www.acmicpc.net/status/?user_id=" + userName + "&result_id=4";
-                ui = new userInformation();
                 doc_status = null;
             } else {
                 //TODO
@@ -59,9 +58,9 @@ public class crawler extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                if (status == "isExist") {
+                if (status.equals("isExist")) {
                     doc_userinfo = Jsoup.connect(url).get();
-                } else if (status == "crawl") {
+                } else if (status.equals("crawl")) {
                     doc_status = Jsoup.connect(url).get();
                 } else {
                     //TODO
