@@ -1,29 +1,25 @@
 package com.example.leeth.boj_rival;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
-import android.content.Intent;
 
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.*;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.RandomAccessFile;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.ArrayList;
 import java.util.Set;
 
 public class main extends AppCompatActivity {
@@ -35,14 +31,14 @@ public class main extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        rivalListButton = new ArrayList<Button>();
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(main.this, add_user.class);
                 startActivity(intent);
-                /*Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();*/
             }
         });
     }
@@ -62,28 +58,7 @@ public class main extends AppCompatActivity {
         }
 
         //refresh
-        /*
-        try {
-            String FILENAME = "user_information";
-            //FileOutputStream fos = openFileOutput(FILENAME, MODE_PRIVATE);
-            //fos.write("".getBytes());
-            //fos.close();
-            FileInputStream fis = openFileInput(FILENAME);
-            try {
-                byte[] readBuffer = new byte[fis.available()];
-                while (fis.read(readBuffer) != -1) {
-                }
-                Toast.makeText(getApplicationContext(), new String(readBuffer), Toast.LENGTH_LONG).show();
-                fis.close();
-            } catch (IOException e) {
-                return;
-            }
-        } catch (FileNotFoundException e) {
-            return;
-        } catch (java.io.IOException e) {
-            return;
-        }
-        */
+        resetUI();
     }
 
     @Override
@@ -108,16 +83,46 @@ public class main extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private ArrayList<Button> rivalListButton;
+
+    private void deleteUserButton() {
+        for(Button button: rivalListButton) {
+            button.setVisibility(View.GONE);
+        }
+        rivalListButton.clear();
+    }
+
     private void makeUserButton() {
-        JSONParser parser = new JSONParser();
-        String file = "user_information";
         try {
-            Object obj = parser.parse(new FileReader(file));
+            final String fileName = "user_information";
+            JSONParser parser = new JSONParser();
+
+            FileInputStream fis = openFileInput(fileName);
+            byte[] data = new byte[fis.available()];
+            while(fis.read(data) != -1){}
+            fis.close();
+
+            Object obj = parser.parse(new String(data));
             JSONObject jsonObject = (JSONObject) obj;
 
             Set<String> keys = jsonObject.keySet();
-            for (String userName : keys) {
-                Toast.makeText(getApplicationContext(),userName,Toast.LENGTH_LONG).show();
+            for (final String userName : keys) {
+                Button newButton = new Button(this);
+                newButton.setText(userName.toCharArray(), 0, userName.length());
+                newButton.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        deleterUser(userName);
+                        resetUI();
+                        return true;
+                    }
+                });
+
+                LinearLayout ll = (LinearLayout)findViewById(R.id.user_list);
+                Toolbar.LayoutParams lp = new Toolbar.LayoutParams(Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.WRAP_CONTENT);
+                ll.addView(newButton, lp);
+
+                rivalListButton.add(newButton);
             }
         } catch (java.io.FileNotFoundException e) {
 
@@ -125,6 +130,33 @@ public class main extends AppCompatActivity {
 
         } catch (org.json.simple.parser.ParseException e) {
 
+        }
+    }
+
+    void resetUI() {
+        deleteUserButton();
+        makeUserButton();
+    }
+
+    public void deleterUser(String userName) {
+        final String fileName = "user_information";
+        JSONParser parser = new JSONParser();
+
+        try {
+            FileInputStream fis = openFileInput(fileName);
+            byte[] data = new byte[fis.available()];
+            while(fis.read(data) != -1){}
+            fis.close();
+
+            JSONObject jsonObject = (JSONObject) parser.parse(new String(data));
+
+            jsonObject.remove(userName);
+
+            FileOutputStream fos = openFileOutput(fileName, MODE_PRIVATE);
+            fos.write(jsonObject.toString().getBytes());
+            fos.close();
+        } catch (Exception e) {
+            return;
         }
     }
 }

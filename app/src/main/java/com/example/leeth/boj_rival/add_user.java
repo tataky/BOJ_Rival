@@ -1,33 +1,20 @@
 package com.example.leeth.boj_rival;
 
-import android.support.v7.app.AppCompatActivity;
-import android.view.animation.AnticipateOvershootInterpolator;
+import android.content.Context;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Button;
-import android.view.inputmethod.InputMethodManager;
-import android.content.Context;
 
 import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.RandomAccessFile;
-import java.util.ArrayList;
-
-import static android.provider.Telephony.Mms.Part.FILENAME;
-import static java.lang.System.exit;
-import static java.security.AccessController.getContext;
+import java.io.FileOutputStream;
 
 
 /**
@@ -79,7 +66,6 @@ public class add_user extends AppCompatActivity {
         final String fileName = "user_information";
 
         TextView v = (TextView) findViewById(R.id.resultview);
-        // change : getFileStreamPath
         File f = getFileStreamPath(fileName);
 
         // if file is not exist, make new empty json file
@@ -90,7 +76,6 @@ public class add_user extends AppCompatActivity {
                 fos.write((obj.toString()).getBytes());
                 fos.close();
             } catch (Exception e) {
-                v.setText("WHY1".toCharArray(),0,3);
                 return;
             }
         }

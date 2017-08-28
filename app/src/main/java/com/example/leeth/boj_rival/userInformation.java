@@ -1,6 +1,5 @@
 package com.example.leeth.boj_rival;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -16,4 +15,5 @@ public class userInformation {
     public userInformation() {
         problems = new HashMap<String, String>();
     }
+
 }
