@@ -9,6 +9,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <application android:name="com.xyz.MyApplication">
+        </application>
+
         <activity
             android:name=".main"
             android:label="@string/app_name"
@@ -24,5 +28,6 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
+
 
 </manifest>
