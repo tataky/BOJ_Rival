@@ -1,12 +1,14 @@
 package com.example.leeth.boj_rival;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 /**
  * Created by leeth on 2017-08-22.
  */
 
-public class userInformation {
+@SuppressWarnings("serial")
+public class userInformation implements Serializable {
     // change public to private
     public String _id;
     public HashMap<String, String> problems, newProblems;

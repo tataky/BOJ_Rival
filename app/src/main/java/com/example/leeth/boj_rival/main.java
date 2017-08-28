@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.app.AlertDialog;
 
-import org.json.simple.JSONObject;
+import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.BufferedReader;
@@ -25,7 +25,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Set;
+
+import static android.R.attr.key;
 
 public class main extends AppCompatActivity {
 
@@ -122,20 +125,52 @@ public class main extends AppCompatActivity {
             fis.close();
 
             Object obj = parser.parse(new String(data));
-            JSONObject jsonObject = (JSONObject) obj;
+            JSONObject jsonObject = new JSONObject(obj.toString());
 
-            Set<String> keys = jsonObject.keySet();
+            Iterator<String> keys = jsonObject.keys();
 
-            for (final String userName : keys) {
+            while (keys.hasNext()) {
+                final String userName = keys.next();
+                Log.d("debug",userName);
                 Button newButton = new Button(this);
                 newButton.setText(userName.toCharArray(), 0, userName.length());
+                newButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(main.this, userDetail.class);
+                        userInformation ui = new userInformation();
+                        JSONParser parser = new JSONParser();
+                        try {
+                            FileInputStream fis = openFileInput(fileName);
+                            byte[] data = new byte[fis.available()];
+                            while (fis.read(data) != -1) {
+                            }
+                            fis.close();
+
+                            Object userInfo = parser.parse(new String(data));
+                            JSONObject jo = new JSONObject(userInfo.toString());
+                            JSONObject info = jo.getJSONObject(userName);
+                            ui._id = userName;
+                            ui.last = info.getInt("last");
+                            JSONObject problemPool = info.getJSONObject("problemPool");
+                            Iterator<String> it = problemPool.keys();
+                            while (it.hasNext()) {
+                                ui.problems.put(it.next(), "");
+                            }
+                        } catch (Exception e) {
+                            return;
+                        }
+                        intent.putExtra("userInfo", ui);
+                        startActivity(intent);
+                    }
+                });
                 newButton.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
                         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                switch (which){
+                                switch (which) {
                                     case DialogInterface.BUTTON_NEGATIVE:
                                         deleteUser(userName);
                                         resetUI();
@@ -153,18 +188,13 @@ public class main extends AppCompatActivity {
                     }
                 });
 
-                LinearLayout ll = (LinearLayout)findViewById(R.id.user_list);
+                LinearLayout ll = (LinearLayout) findViewById(R.id.user_list);
                 Toolbar.LayoutParams lp = new Toolbar.LayoutParams(Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.WRAP_CONTENT);
                 ll.addView(newButton, lp);
 
                 rivalListButton.add(newButton);
             }
-        } catch (java.io.FileNotFoundException e) {
-
-        } catch (java.io.IOException e) {
-
-        } catch (org.json.simple.parser.ParseException e) {
-
+        } catch (Exception e) {
         }
     }
 
@@ -183,7 +213,7 @@ public class main extends AppCompatActivity {
             while(fis.read(data) != -1){}
             fis.close();
 
-            JSONObject jsonObject = (JSONObject) parser.parse(new String(data));
+            JSONObject jsonObject = new JSONObject(parser.parse(new String(data)).toString());
 
             jsonObject.remove(userName);
 

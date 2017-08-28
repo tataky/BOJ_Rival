@@ -27,6 +27,8 @@
             android:name=".add_user"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity android:name=".userDetail"
+        android:screenOrientation="portrait"/>
     </application>
 
 
