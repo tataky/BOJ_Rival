@@ -2,10 +2,14 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/BOJ_Rival.iml" filepath="$PROJECT_DIR$/BOJ_Rival.iml" />
       <module fileurl="file://$PROJECT_DIR$/BOJ_Rival_test.iml" filepath="$PROJECT_DIR$/BOJ_Rival_test.iml" />
       <module fileurl="file://$PROJECT_DIR$/BOJ_rival.iml" filepath="$PROJECT_DIR$/BOJ_rival.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/json-simple-1.1.1/json-simple-1.1.1.iml" filepath="$PROJECT_DIR$/json-simple-1.1.1/json-simple-1.1.1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/json-simple-1.1.1/json-simple-1.1.1.iml" filepath="$PROJECT_DIR$/json-simple-1.1.1/json-simple-1.1.1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jsoup-1.10.3/jsoup-1.10.3.iml" filepath="$PROJECT_DIR$/jsoup-1.10.3/jsoup-1.10.3.iml" />
       <module fileurl="file://$PROJECT_DIR$/jsoup-1.10.3/jsoup-1.10.3.iml" filepath="$PROJECT_DIR$/jsoup-1.10.3/jsoup-1.10.3.iml" />
     </modules>
   </component>

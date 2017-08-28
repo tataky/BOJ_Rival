@@ -8,10 +8,23 @@
     tools:context="com.example.leeth.boj_rival.main"
     tools:showIn="@layout/activity_main">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-        android:layout_height="match_parent" android:orientation="vertical"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="16dp"></LinearLayout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="368dp"
+        android:layout_height="495dp" android:orientation="vertical"
         android:id="@+id/user_list">
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/button_survey"
+        android:layout_width="88dp"
+        android:layout_height="52dp"
+        android:layout_weight="1"
+        android:text="Button" />
+
 
 </android.support.constraint.ConstraintLayout>

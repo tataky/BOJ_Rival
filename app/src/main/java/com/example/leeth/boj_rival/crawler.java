@@ -2,6 +2,7 @@ package com.example.leeth.boj_rival;
 
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.Toast;
 
 import org.jsoup.Jsoup;
@@ -20,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import static android.support.v7.widget.AppCompatDrawableManager.get;
 import static java.lang.System.exit;
@@ -59,9 +61,9 @@ public class crawler extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
             try {
                 if (status.equals("isExist")) {
-                    doc_userinfo = Jsoup.connect(url).get();
+                    doc_userinfo = Jsoup.connect(url).maxBodySize(0).get();
                 } else if (status.equals("crawl")) {
-                    doc_status = Jsoup.connect(url).get();
+                    doc_status = Jsoup.connect(url).maxBodySize(0).get();
                 } else {
                     //TODO
                 }
@@ -112,11 +114,13 @@ public class crawler extends AppCompatActivity {
         ui = new userInformation();
         ui._id = userName;
         Elements problemPool = doc_userinfo.select("div.panel-body").first().select("span.problem_number");
+        Elements problemName = doc_userinfo.select("div.panel-body").first().select("span.problem_title");
+        Iterator<Element> e1 = problemName.iterator();
         for (Element e : problemPool) {
-            ui.problems.put(e.text(),"");
+            Element e2 = e1.next();
+            ui.problems.put(e.text() + "/" + e2.text(), "");
         }
         ui.last = Integer.parseInt(doc_status.select("#status-table tbody tr td").first().ownText());
-
         return ui;
     }
 }

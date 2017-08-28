@@ -1,21 +1,26 @@
 package com.example.leeth.boj_rival;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.app.AlertDialog;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -26,6 +31,20 @@ public class main extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        final String fileName = "problemName";
+        TextView v = (TextView) findViewById(R.id.resultview);
+        File f = getFileStreamPath(fileName);
+
+        // if file is not exist, make new empty json file
+        if(!f.exists()) {
+            try {
+                FileOutputStream fos = openFileOutput(fileName, MODE_PRIVATE);
+                fos.write("".getBytes());
+                fos.close();
+            } catch (Exception e) {
+            }
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -106,14 +125,30 @@ public class main extends AppCompatActivity {
             JSONObject jsonObject = (JSONObject) obj;
 
             Set<String> keys = jsonObject.keySet();
+
             for (final String userName : keys) {
                 Button newButton = new Button(this);
                 newButton.setText(userName.toCharArray(), 0, userName.length());
                 newButton.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        deleterUser(userName);
-                        resetUI();
+                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which){
+                                    case DialogInterface.BUTTON_NEGATIVE:
+                                        deleteUser(userName);
+                                        resetUI();
+                                        break;
+                                    case DialogInterface.BUTTON_POSITIVE:
+                                        break;
+                                }
+                            }
+                        };
+                        AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                        builder.setMessage("Are you sure?").setNegativeButton("Yes", dialogClickListener)
+                                .setPositiveButton("No", dialogClickListener).show();
+
                         return true;
                     }
                 });
@@ -138,7 +173,7 @@ public class main extends AppCompatActivity {
         makeUserButton();
     }
 
-    public void deleterUser(String userName) {
+    public void deleteUser(String userName) {
         final String fileName = "user_information";
         JSONParser parser = new JSONParser();
 

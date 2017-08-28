@@ -9,11 +9,12 @@ import java.util.HashMap;
 public class userInformation {
     // change public to private
     public String _id;
-    public HashMap<String, String> problems;
+    public HashMap<String, String> problems, newProblems;
     public int last;
 
     public userInformation() {
         problems = new HashMap<String, String>();
+        newProblems = new HashMap<String, String>();
     }
 
 }
