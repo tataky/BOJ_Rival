@@ -1,12 +1,12 @@
 package com.example.leeth.boj_rival;
 
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.app.AlertDialog;
 
 import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -26,9 +25,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
-
-import static android.R.attr.key;
 
 public class main extends AppCompatActivity {
 
@@ -131,7 +127,6 @@ public class main extends AppCompatActivity {
 
             while (keys.hasNext()) {
                 final String userName = keys.next();
-                Log.d("debug",userName);
                 Button newButton = new Button(this);
                 newButton.setText(userName.toCharArray(), 0, userName.length());
                 newButton.setOnClickListener(new View.OnClickListener() {

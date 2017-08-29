@@ -13,6 +13,7 @@ public class userInformation implements Serializable {
     public String _id;
     public HashMap<String, String> problems, newProblems;
     public int last;
+    public int updated;
 
     public userInformation() {
         problems = new HashMap<String, String>();
