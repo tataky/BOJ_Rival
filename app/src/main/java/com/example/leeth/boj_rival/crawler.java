@@ -3,28 +3,17 @@ package com.example.leeth.boj_rival;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
-import java.net.URL;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-
-import static android.support.v7.widget.AppCompatDrawableManager.get;
-import static java.lang.System.exit;
 
 /**
  * Created by leeth on 2017-08-22.
@@ -34,7 +23,7 @@ public class crawler extends AppCompatActivity {
 
     public String url;
     public userInformation ui;
-    Document doc_userinfo, doc_status;
+    Document doc_userinfo, doc_status, doc_additional;
     String result;
     String userName;
     String status;
@@ -52,8 +41,11 @@ public class crawler extends AppCompatActivity {
             } else if (status.equals("crawl")) {
                 url = "https://www.acmicpc.net/status/?user_id=" + userName + "&result_id=4";
                 doc_status = null;
+            } else if (status.equals("additionalCrawl")){
+                url = "https://www.acmicpc.net/status/?user_id=" + userName + "&result_idx=4&top=" + last;
+                doc_additional = null;
             } else {
-                //TODO
+                Log.d("debug", "what I crawl?");
             }
         }
 
@@ -64,6 +56,8 @@ public class crawler extends AppCompatActivity {
                     doc_userinfo = Jsoup.connect(url).maxBodySize(0).get();
                 } else if (status.equals("crawl")) {
                     doc_status = Jsoup.connect(url).maxBodySize(0).get();
+                } else if (status.equals("additionalCrawl")){
+                    doc_additional = Jsoup.connect(url).maxBodySize(0).get();
                 } else {
                     //TODO
                 }
@@ -121,6 +115,47 @@ public class crawler extends AppCompatActivity {
             ui.problems.put(e.text() + "/" + e2.text(), "");
         }
         ui.last = Integer.parseInt(doc_status.select("#status-table tbody tr td").first().ownText());
+        ui.updated = ui.last;
         return ui;
+    }
+
+    HashMap<String, String> updatedList;
+    int last;
+
+    void recursiveCrawl(final int last) {
+        JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
+        this.last = last;
+
+        try {
+            jsoupAsyncTask.execute().get();
+
+            Elements list = doc_additional.select("table#status-table > tbody").first().select("td > a.problem_title");
+
+            Iterator<Element> it = list.iterator();
+            while(it.hasNext()) {
+                Element s = it.next();
+                String item = s.ownText() + "/" + s.attr("title");
+                updatedList.put(item,"");
+                Log.d("debug",item);
+            }
+
+            Elements check = doc_additional.select("a#prev_page");
+            if(check.isEmpty())   return;
+            int nextLast = Integer.parseInt(check.attr("href").split("=")[2]);
+            recursiveCrawl(nextLast);
+        } catch(Exception e) {
+            Log.d("debug", "die async");
+        }
+
+    }
+
+    public HashMap<String, String> updatedProblemList(final String userName, final int last) {
+        this.userName = userName;
+        status = "additionalCrawl";
+
+        updatedList = new HashMap<String, String>();
+        recursiveCrawl(last);
+
+        return updatedList;
     }
 }
