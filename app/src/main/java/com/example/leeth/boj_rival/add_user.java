@@ -3,6 +3,7 @@ package com.example.leeth.boj_rival;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -15,6 +16,10 @@ import org.json.simple.parser.JSONParser;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -63,26 +68,64 @@ public class add_user extends AppCompatActivity {
     }
 
     public void addUser(View view) {
-        final String fileName = "user_information";
+        final String fileUserId = "userID.txt", fileUserInfo = currentUser._id + ".json";
 
         TextView v = (TextView) findViewById(R.id.resultview);
-        File f = getFileStreamPath(fileName);
-
-        // if file is not exist, make new empty json file
-        if(!f.exists()) {
+        File fId = getFileStreamPath(fileUserId), fInfo = getFileStreamPath(fileUserInfo);
+        // if file is not exist, make new empty txt file
+        if(!fId.exists()) {
             try {
-                FileOutputStream fos = openFileOutput(fileName, MODE_PRIVATE);
-                JSONObject obj = new JSONObject();
-                fos.write((obj.toString()).getBytes());
+                FileOutputStream fos = openFileOutput(fileUserId, MODE_PRIVATE);
+                fos.write("".getBytes());
+                fos.close();
+            } catch (Exception e) {
+                return;
+            }
+        }
+        if(!fInfo.exists()) {
+            try {
+                FileOutputStream fos = openFileOutput(fileUserInfo, MODE_PRIVATE);
+                fos.write(new JSONObject().toString().getBytes());
                 fos.close();
             } catch (Exception e) {
                 return;
             }
         }
 
+        ArrayList<String> idSet = new ArrayList<String>();
+        try {
+            FileInputStream fis = openFileInput(fileUserId);
+            byte[] data = new byte[fis.available()];
+
+            boolean fileNotEmpty = false;
+            if (fis.available() != 0) {
+                fileNotEmpty = true;
+                while (fis.read(data) != -1) {
+                }
+            }
+            String raw = new String(data,0,data.length);
+            String[] nameList = new String[0];
+            if(fileNotEmpty && !raw.isEmpty()) nameList = raw.split("\n");
+
+            for (String name : nameList) {
+                idSet.add(name);
+            }
+            if (idSet.contains(currentUser._id)) {
+                String str = "Already exist";
+                v.setText(str.toCharArray(), 0, str.length());
+                return;
+            }
+            FileOutputStream fos = openFileOutput(fileUserId, MODE_APPEND);
+            fos.write((currentUser._id+"\n").getBytes());
+            fos.close();
+        } catch (Exception e) {
+            Log.d("debug","addUser");
+            return;
+        }
+
         JSONParser parser = new JSONParser();
         try {
-            FileInputStream fis = openFileInput(fileName);
+            FileInputStream fis = openFileInput(fileUserInfo);
             byte[] data = new byte[fis.available()];
             while(fis.read(data) != -1){}
             fis.close();
@@ -90,19 +133,10 @@ public class add_user extends AppCompatActivity {
             Object userInfo = parser.parse(new String(data));
             JSONObject jsonObject = new JSONObject(userInfo.toString());
 
-            if (jsonObject.has(currentUser._id)) {
-                String str = "Already exist";
-                v.setText(str.toCharArray(), 0, str.length());
-                return;
-            }
+            jsonObject.put("last", currentUser.last);
+            jsonObject.put("problemPool", new JSONObject(currentUser.problems));
 
-            JSONObject obj = new JSONObject();
-            obj.put("last", currentUser.last);
-            obj.put("problemPool", new JSONObject(currentUser.problems));
-            jsonObject.put(currentUser._id, obj);
-
-            // change : not mode_append
-            FileOutputStream fos = openFileOutput(fileName, MODE_PRIVATE);
+            FileOutputStream fos = openFileOutput(fileUserInfo, MODE_PRIVATE);
             fos.write(jsonObject.toString().getBytes());
             fos.close();
 

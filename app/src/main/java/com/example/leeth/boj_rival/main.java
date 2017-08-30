@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,25 +26,14 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
+import static android.R.attr.x;
 
 public class main extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        final String fileName = "problemName";
-        TextView v = (TextView) findViewById(R.id.resultview);
-        File f = getFileStreamPath(fileName);
-
-        // if file is not exist, make new empty json file
-        if(!f.exists()) {
-            try {
-                FileOutputStream fos = openFileOutput(fileName, MODE_PRIVATE);
-                fos.write("".getBytes());
-                fos.close();
-            } catch (Exception e) {
-            }
-        }
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -64,16 +54,6 @@ public class main extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-
-        BufferedReader br;
-        try {
-            br = new BufferedReader(new FileReader("user_information"));
-            String line;
-            while ((line = br.readLine()) != null) {
-                Toast.makeText(getApplicationContext(),line,Toast.LENGTH_LONG).show();
-            }
-        } catch (java.io.IOException e) {
-        }
 
         //refresh
         resetUI();
@@ -111,24 +91,41 @@ public class main extends AppCompatActivity {
     }
 
     private void makeUserButton() {
-        try {
-            final String fileName = "user_information";
-            JSONParser parser = new JSONParser();
 
+        try {
+            final String fileName = "userID.txt";
+
+            File f = getFileStreamPath(fileName);
+            if (!f.exists()) {
+                Log.d("debug","file not exist");
+                try {
+                    FileOutputStream fos = openFileOutput(fileName,MODE_PRIVATE);
+                    fos.write("".getBytes());
+                    fos.close();
+                } catch (Exception e) {
+                    Log.d("debug","namgyu");
+                }
+            }
             FileInputStream fis = openFileInput(fileName);
             byte[] data = new byte[fis.available()];
-            while(fis.read(data) != -1){}
+            boolean fileNotEmpty = false;
+            if (fis.available() != 0) {
+                fileNotEmpty = true;
+                while (fis.read(data) != -1) {
+                }
+            }
             fis.close();
 
-            Object obj = parser.parse(new String(data));
-            JSONObject jsonObject = new JSONObject(obj.toString());
+            String raw = new String(data,0,data.length);
+            String[] idArray = new String[0];
+            if(fileNotEmpty && !raw.isEmpty()) {
+                idArray = raw.split("\n");
+            }
 
-            Iterator<String> keys = jsonObject.keys();
-
-            while (keys.hasNext()) {
-                final String userName = keys.next();
+            for(final String userName : idArray) {
                 Button newButton = new Button(this);
                 newButton.setText(userName.toCharArray(), 0, userName.length());
+
                 newButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -136,6 +133,7 @@ public class main extends AppCompatActivity {
                         userInformation ui = new userInformation();
                         JSONParser parser = new JSONParser();
                         try {
+                            String fileName = userName + ".json";
                             FileInputStream fis = openFileInput(fileName);
                             byte[] data = new byte[fis.available()];
                             while (fis.read(data) != -1) {
@@ -143,8 +141,7 @@ public class main extends AppCompatActivity {
                             fis.close();
 
                             Object userInfo = parser.parse(new String(data));
-                            JSONObject jo = new JSONObject(userInfo.toString());
-                            JSONObject info = jo.getJSONObject(userName);
+                            JSONObject info = new JSONObject(userInfo.toString());
                             ui._id = userName;
                             ui.last = info.getInt("last");
                             JSONObject problemPool = info.getJSONObject("problemPool");
@@ -188,9 +185,13 @@ public class main extends AppCompatActivity {
                 ll.addView(newButton, lp);
 
                 rivalListButton.add(newButton);
+
             }
+
         } catch (Exception e) {
+            Log.d("debug","wow!");
         }
+
     }
 
     void resetUI() {
@@ -199,23 +200,40 @@ public class main extends AppCompatActivity {
     }
 
     public void deleteUser(String userName) {
-        final String fileName = "user_information";
-        JSONParser parser = new JSONParser();
+        final String fileName = "userID.txt";
+        File f = getFileStreamPath(userName + ".json");
+        if (f.delete()) {
+        } else {
+            Log.d("debug","delete failed");
+        }
 
         try {
             FileInputStream fis = openFileInput(fileName);
             byte[] data = new byte[fis.available()];
-            while(fis.read(data) != -1){}
+
+            boolean fileNotEmpty = false;
+            if (fis.available() != 0) {
+                fileNotEmpty = true;
+                while (fis.read(data) != -1) {
+                }
+            }
             fis.close();
 
-            JSONObject jsonObject = new JSONObject(parser.parse(new String(data)).toString());
+            String raw = new String(data,0,data.length);
+            String[] temp = new String[0];
+            if(fileNotEmpty && !raw.isEmpty()) temp = raw.split("\n");
 
-            jsonObject.remove(userName);
-
+            ArrayList<String> idList = new ArrayList<String>();
+            for(String name : temp) {
+                if (!name.equals(userName)) idList.add(name);
+            }
             FileOutputStream fos = openFileOutput(fileName, MODE_PRIVATE);
-            fos.write(jsonObject.toString().getBytes());
+            for(String name: idList) {
+                fos.write((name + "\n").getBytes());
+            }
             fos.close();
         } catch (Exception e) {
+            Log.d("debug","what");
             return;
         }
     }

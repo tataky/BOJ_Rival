@@ -42,7 +42,7 @@ public class crawler extends AppCompatActivity {
                 url = "https://www.acmicpc.net/status/?user_id=" + userName + "&result_id=4";
                 doc_status = null;
             } else if (status.equals("additionalCrawl")){
-                url = "https://www.acmicpc.net/status/?user_id=" + userName + "&result_idx=4&top=" + last;
+                url = "https://www.acmicpc.net/status/?user_id=" + userName + "&result_id=4&top=" + last;
                 doc_additional = null;
             } else {
                 Log.d("debug", "what I crawl?");
@@ -125,7 +125,6 @@ public class crawler extends AppCompatActivity {
     void recursiveCrawl(final int last) {
         JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
         this.last = last;
-
         try {
             jsoupAsyncTask.execute().get();
 
@@ -136,12 +135,11 @@ public class crawler extends AppCompatActivity {
                 Element s = it.next();
                 String item = s.ownText() + "/" + s.attr("title");
                 updatedList.put(item,"");
-                Log.d("debug",item);
             }
 
             Elements check = doc_additional.select("a#prev_page");
             if(check.isEmpty())   return;
-            int nextLast = Integer.parseInt(check.attr("href").split("=")[2]);
+            int nextLast = Integer.parseInt(check.attr("href").split("=")[3]);
             recursiveCrawl(nextLast);
         } catch(Exception e) {
             Log.d("debug", "die async");

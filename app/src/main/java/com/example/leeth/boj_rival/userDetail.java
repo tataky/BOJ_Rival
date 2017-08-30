@@ -26,13 +26,13 @@ public class userDetail extends AppCompatActivity {
         TextView userIdView=(TextView)findViewById(R.id.user_id);
         userIdView.setText(prevUi._id);
         TextView userScoreView=(TextView)findViewById(R.id.user_score);
-        userScoreView.setText(""+prevUi.problems.size());
 
         LinearLayout ll = (LinearLayout) findViewById(R.id.problem_list);
         crawler cr = new crawler();
         HashMap<String, String> updatedList = cr.updatedProblemList(prevUi._id, prevUi.last);
 
         Set<String> s = updatedList.keySet();
+        int newProblemCount = prevUi.problems.size();
         Iterator<String> it = s.iterator();
 
         while(it.hasNext()) {
@@ -40,11 +40,13 @@ public class userDetail extends AppCompatActivity {
             String check = prevUi.problems.get(cur);
             if(check != null)   continue;
 
+            newProblemCount++;
             TextView newText = new TextView(this);
             newText.setText(cur);
             newText.setTextSize(30);
             newText.setGravity(1);
             ll.addView(newText);
         }
+        userScoreView.setText(""+newProblemCount);
     }
 }
